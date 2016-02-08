@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.hannesdorfmann.adaptercommands.example.MainActivity"
+    >
+
+  <android.support.v4.widget.SwipeRefreshLayout
+      android:id="@+id/refreshLayout"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_above="@+id/remove"
+      >
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+    >
+  </android.support.v4.widget.SwipeRefreshLayout>
+
+  <Button
+      android:id="@+id/add"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toLeftOf="@+id/remove"
+      android:text="Add"
+      android:layout_above="@+id/clear"
+      />
+
+
+  <Button
+      android:id="@+id/remove"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerHorizontal="true"
+      android:layout_marginLeft="6dp"
+      android:layout_marginRight="6dp"
+      android:text="Remove"
+      android:layout_above="@+id/clear"
+
+      />
+
+
+  <Button
+      android:id="@+id/change"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toRightOf="@+id/remove"
+      android:text="Change"
+      android:layout_above="@+id/clear"
+      />
+
+  <Button
+      android:id="@+id/clear"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="clear"
+      android:layout_alignParentBottom="true"
+      android:layout_centerHorizontal="true"
+      />
+
+  <Button
+      android:id="@+id/notifyChanged"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="notifyChanged"
+      android:layout_toRightOf="@id/clear"
+      android:layout_alignParentBottom="true"
+      />
+
+    <Button
+        android:id="@+id/move"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="move"
+        android:layout_toLeftOf="@+id/clear"
+        android:layout_alignParentBottom="true"
+        />
+
+
+</RelativeLayout>

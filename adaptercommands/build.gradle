@@ -1,0 +1,38 @@
+apply plugin: 'com.android.library'
+
+android {
+  compileSdkVersion 23
+  buildToolsVersion "23.0.2"
+
+  defaultConfig {
+    minSdkVersion 14
+    targetSdkVersion 23
+    versionCode 1
+    versionName "1.0"
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+}
+
+dependencies {
+
+  compile 'com.android.support:recyclerview-v7:'+rootProject.ext.recyclerviewVersion
+
+
+  testCompile 'junit:junit:' + rootProject.ext.junitVersion
+  testCompile 'org.mockito:mockito-core:' + rootProject.ext.mockitoVersion
+
+
+  testCompile('org.powermock:powermock-api-mockito:' + rootProject.ext.powermockVersion) {
+    exclude module: 'hamcrest-core'
+    exclude module: 'objenesis'
+  }
+  testCompile('org.powermock:powermock-module-junit4:' + rootProject.ext.powermockVersion) {
+    exclude module: 'hamcrest-core'
+    exclude module: 'objenesis'
+  }
+}
