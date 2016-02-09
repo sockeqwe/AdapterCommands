@@ -1,14 +1,15 @@
 package com.hannesdorfmann.adaptercommands;
 
 import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
+import android.util.Log;
 import com.hannesdorfmann.adaptercommands.command.AdapterCommand;
 import com.hannesdorfmann.adaptercommands.command.EntireDataSetChangedCommand;
 import com.hannesdorfmann.adaptercommands.command.ItemChangedCommand;
 import com.hannesdorfmann.adaptercommands.command.ItemInsertedCommand;
-import com.hannesdorfmann.adaptercommands.command.ItemMovedCommand;
 import com.hannesdorfmann.adaptercommands.command.ItemRangeChangedCommand;
 import com.hannesdorfmann.adaptercommands.command.ItemRangeInsertedCommand;
+import com.hannesdorfmann.adaptercommands.command.ItemRangeRemovedCommand;
+import com.hannesdorfmann.adaptercommands.command.ItemRemovedCommand;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +20,10 @@ import java.util.List;
  * @author Hannes Dorfmann
  * @since 1.0
  */
-public class CommandsCalculator {
+public class CommandsCalculator<T extends List> {
 
   // TODO considering using guavas BiMap
-  private ArrayMap<Object, Integer> oldPositions;
+  private T oldList;
 
   private int insertStartIndex = -1;
   private int insertLastIndex = -1;
@@ -38,92 +39,89 @@ public class CommandsCalculator {
    * data changed or not)
    * @return List of commands
    */
-  public <T> List<AdapterCommand> calculateDiff(@NonNull List<T> newList,
-      ItemChangeDetector<T> detector) {
+  public List<AdapterCommand> calculateDiff(@NonNull T newList, ItemChangeDetector<T> detector) {
 
     int newSize = newList.size();
     // first time called
-    if (oldPositions == null) {
-      oldPositions = new ArrayMap<>(newSize);
-
-      for (int i = 0; i < newSize; i++) {
-        oldPositions.put(newList.get(i), i);
-      }
+    if (oldList == null) {
+      oldList = (T) new ArrayList<>();
+      oldList.addAll(newList);
 
       List<AdapterCommand> commands = new ArrayList<>(1);
       commands.add(new EntireDataSetChangedCommand());
       return commands;
     }
 
-
-    insertStartIndex = -1;
-    insertLastIndex = -1;
-    changedStartIndex = -1;
-    changedLastIndex = -1;
-    int insertCount = 0;
+    // new list empty
+    if (newList.isEmpty()) {
+      List<AdapterCommand> commands = new ArrayList<>(1);
+      commands.add(new ItemRangeRemovedCommand(0, oldList.size()));
+      oldList.clear(); // for next call
+      return commands;
+    }
 
     List<AdapterCommand> commands = new ArrayList<>(newSize);
-    ArrayMap<Object, Integer> newPositions = new ArrayMap<>(newSize);
 
-    for (int i = 0; i < newSize; i++) {
-      Object newItem = newList.get(i);
-      newPositions.put(newItem, i);
+    int M = oldList.size();
+    int N = newList.size();
 
-      // Search if position has changed
-      Integer oldPositionWrapper = oldPositions.get(newItem);
-      if (oldPositionWrapper == null) {
+    // opt[i][j] = length of LCS of oldList[i..M] and y[j..N]
+    int[][] opt = new int[M + 1][N + 1];
 
-        // Any ChangeCommands left?
-        addChangeCommandsIfNeeded(commands);
-
-        // Not in the previous list
-        if (insertStartIndex == -1) {
-          insertStartIndex = i;
-        }
-        insertLastIndex = i;
-      } else {
-        // unbox int wrapper
-        int oldPos = oldPositionWrapper;
-
-        // Any Insert-Commands left?
-        insertCount += addInsertCommandsIfNeeded(commands);
-
-        // Has an item changed?
-        if (oldPos == i) {
-          // Item changed?
-          if (detector != null) {
-            int keyIndex = oldPositions.indexOfKey(newItem);
-            Object oldItem = oldPositions.keyAt(keyIndex);
-            if (detector.hasChanged((T) oldItem, (T) newItem)) {
-              if (changedStartIndex == -1) {
-                changedStartIndex = i;
-              }
-              changedLastIndex = i;
-            } else {
-              addChangeCommandsIfNeeded(commands);
-            }
-          }
+    // compute length of LCS and all subproblems via dynamic programming
+    for (int i = M - 1; i >= 0; i--) {
+      for (int j = N - 1; j >= 0; j--) {
+        if (oldList.get(i).equals(newList.get(j))) {
+          opt[i][j] = opt[i + 1][j + 1] + 1;
         } else {
-          addChangeCommandsIfNeeded(commands);
-
-          // Item moved
-          int beforeInsertsPosition = i - insertCount;
-          if (beforeInsertsPosition != oldPos) {
-            commands.add(new ItemMovedCommand(oldPos, i));
-          }
+          opt[i][j] = Math.max(opt[i + 1][j], opt[i][j + 1]);
         }
       }
     }
 
-    //
-    // Are some operations left that we haven't transformed to commands yet?
-    //
-    addInsertCommandsIfNeeded(commands);
-    addChangeCommandsIfNeeded(commands);
+    int inserRemoveOffset = 0;
+    // recover LCS itself and print out non-matching lines to standard output
+    int i = 0, j = 0;
+    while (i < M && j < N) {
+      if (oldList.get(i).equals(newList.get(j))) {
+        i++;
+        j++;
+      } else if (opt[i + 1][j] >= opt[i][j + 1]) {
+        commands.add(new ItemRemovedCommand(i + inserRemoveOffset));
+        Log.d("Items", "Alg: removed item at " + (i));
+        inserRemoveOffset--;
+        i++;
+      } else {
+        commands.add(new ItemInsertedCommand(j));
+        Log.d("Items", "Alg: inserted item at " + (j));
+        inserRemoveOffset++;
+        j++;
+      }
+    }
 
-    // TODO remove commands
+    // dump out one remainder of one string if the other is exhausted
+    while (i < M || j < N) {
+      if (i == M) {
+        commands.add(new ItemInsertedCommand(j));
+        inserRemoveOffset++;
+        Log.d("Items", "Alg: inserted item  at " + (j));
+        j++;
+      } else if (j == N) {
+        commands.add(new ItemRemovedCommand(i+inserRemoveOffset));
+        inserRemoveOffset--;
+        Log.d("Items", "Alg: removed item at " + (i));
+        i++;
+      }
+    }
 
-    oldPositions = newPositions;
+    oldList.clear();
+    oldList.addAll(newList);
+
+    // batch commands
+    for (int k = 0; k < commands.size(); k++) {
+
+    }
+
     return commands;
   }
 

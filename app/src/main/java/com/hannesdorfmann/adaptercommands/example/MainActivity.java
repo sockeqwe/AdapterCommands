@@ -79,17 +79,33 @@ public class MainActivity extends AppCompatActivity
     int addCount = random.nextInt(3) + 1;
 
     for (int i = 0; i < addCount; i++) {
-      int position = random.nextInt(items.size());
+      int position = items.size() == 0 ? 0 : random.nextInt(items.size());
       Item item = new Item(id(), randomColor());
       items.add(position, item);
-      Log.d("Items", "added Item(" + item + ") at position" + position);
+      //adapter.notifyItemInserted(position);
+      Log.d("Items", "added Item(" + item + ") at position " + position);
     }
+
 
     updateAdapter();
   }
 
   @OnClick(R.id.remove) public void removeClicked() {
 
+    if (items.size() < 3){
+      return;
+    }
+
+    int removeCount = 3;
+
+    for (int i = 0; i < removeCount; i++) {
+      int position = random.nextInt(items.size());
+      Item item = items.remove(position);
+      //adapter.notifyItemInserted(position);
+      Log.d("Items", "removed Item(" + item + ") at position " + position);
+    }
+
+    updateAdapter();
   }
 
   @OnClick(R.id.move) public void moveClicked() {
@@ -118,7 +134,7 @@ public class MainActivity extends AppCompatActivity
 
   @OnClick(R.id.clear) public void clearClicked() {
     items.clear();
-    updateAdapter();
+    adapter.notifyDataSetChanged();
   }
 
   private void updateAdapter() {
