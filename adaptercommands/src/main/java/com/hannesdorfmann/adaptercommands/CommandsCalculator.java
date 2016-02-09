@@ -1,7 +1,6 @@
 package com.hannesdorfmann.adaptercommands;
 
 import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import com.hannesdorfmann.adaptercommands.command.AdapterCommand;
 import com.hannesdorfmann.adaptercommands.command.EntireDataSetChangedCommand;
@@ -62,6 +61,9 @@ public class CommandsCalculator<T extends List> {
     }
 
 
+    List<AdapterCommand> commands = new ArrayList<>(newSize);
+
+
     int M = oldList.size();
     int N = newList.size();
 
@@ -117,8 +119,6 @@ public class CommandsCalculator<T extends List> {
     oldList.clear();
     oldList.addAll(newList);
 
-
-    List<AdapterCommand> commands = new ArrayList<>(newSize);
 
     // batch commands
     for (int k = 0; k < commands.size(); k++) {
