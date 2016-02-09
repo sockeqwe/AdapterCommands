@@ -86,13 +86,14 @@ public class MainActivity extends AppCompatActivity
       Log.d("Items", "added Item(" + item + ") at position " + position);
     }
 
-
     updateAdapter();
   }
 
   @OnClick(R.id.remove) public void removeClicked() {
 
-    if (items.size() < 3){
+    if (items.size() < 3) {
+      items.clear();
+      updateAdapter();
       return;
     }
 
@@ -132,9 +133,31 @@ public class MainActivity extends AppCompatActivity
     adapter.notifyDataSetChanged();
   }
 
-  @OnClick(R.id.clear) public void clearClicked() {
-    items.clear();
-    adapter.notifyDataSetChanged();
+  @OnClick(R.id.addRemove) public void addRemoveClicked() {
+
+    if (items.size() < 3) {
+      return;
+    }
+
+    int removals = random.nextInt(4) + 1;
+    for (int i = 0; i < removals; i++) {
+      if (items.isEmpty()) {
+        continue;
+      }
+      int removePosition = random.nextInt(items.size());
+      Item item = items.remove(removePosition);
+      Log.d("Items", "removed Item(" + item + ") at position " + removePosition);
+    }
+
+    int inserts = random.nextInt(4) + 1;
+    for (int i = 0; i < inserts; i++) {
+      int addPosition = items.isEmpty() ? 0 : random.nextInt(items.size());
+      Item item = new Item(id(), randomColor());
+      items.add(addPosition, item);
+      Log.d("Items", "Added Item(" + item + ") at position " + addPosition);
+    }
+
+    updateAdapter();
   }
 
   private void updateAdapter() {
