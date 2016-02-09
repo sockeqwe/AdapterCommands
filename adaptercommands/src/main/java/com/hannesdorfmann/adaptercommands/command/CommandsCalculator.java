@@ -1,17 +1,12 @@
-package com.hannesdorfmann.adaptercommands;
+package com.hannesdorfmann.adaptercommands.command;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
-import com.hannesdorfmann.adaptercommands.command.AdapterCommand;
-import com.hannesdorfmann.adaptercommands.command.EntireDataSetChangedCommand;
-import com.hannesdorfmann.adaptercommands.command.ItemChangedCommand;
-import com.hannesdorfmann.adaptercommands.command.ItemInsertedCommand;
-import com.hannesdorfmann.adaptercommands.command.ItemRangeChangedCommand;
-import com.hannesdorfmann.adaptercommands.command.ItemRangeInsertedCommand;
-import com.hannesdorfmann.adaptercommands.command.ItemRangeRemovedCommand;
-import com.hannesdorfmann.adaptercommands.command.ItemRemovedCommand;
+import com.hannesdorfmann.adaptercommands.ItemChangeDetector;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is responsible to calculate the difference between two lists and returns a list of
@@ -80,6 +75,9 @@ public class CommandsCalculator<T> {
       }
     }
 
+    LinkedHashMap<T, ItemInsertedCommand> insertCommands = new LinkedHashMap<>();
+    LinkedHashMap<T, ItemRemovedCommand> removeCommands = new LinkedHashMap<>();
+
     int insertRemoveOffset = 0;
     // recover LCS itself and print out non-matching lines to standard output
     int i = 0, j = 0;
@@ -88,15 +86,13 @@ public class CommandsCalculator<T> {
         i++;
         j++;
       } else if (opt[i + 1][j] >= opt[i][j + 1]) {
-        commands.add(new ItemRemovedCommand(i + insertRemoveOffset));
         T item = oldList.get(i);
-        Log.d("Items", "Alg: removed item (" + item + ") at position " + (i));
+        handleRemoveCommand(item, i + insertRemoveOffset, insertCommands, removeCommands, commands);
         insertRemoveOffset--;
         i++;
       } else {
-        commands.add(new ItemInsertedCommand(j));
         T item = newList.get(j);
-        Log.d("Items", "Alg: inserted item (" + item + ") at position " + (j));
+        handleInsertCommand(item, j, insertCommands, removeCommands, commands);
         insertRemoveOffset++;
         j++;
       }
@@ -105,16 +101,14 @@ public class CommandsCalculator<T> {
     // dump out one remainder of one string if the other is exhausted
     while (i < M || j < N) {
       if (i == M) {
-        commands.add(new ItemInsertedCommand(j));
-        insertRemoveOffset++;
         T item = newList.get(j);
-        Log.d("Items", "Alg: inserted item (" + item + ") at position " + (j));
+        handleInsertCommand(item, j, insertCommands, removeCommands, commands);
+        insertRemoveOffset++;
         j++;
       } else if (j == N) {
-        commands.add(new ItemRemovedCommand(i + insertRemoveOffset));
-        insertRemoveOffset--;
         T item = oldList.get(i);
-        Log.d("Items", "Alg: removed item (" + item + ") at position " + (i));
+        handleRemoveCommand(item, i + insertRemoveOffset, insertCommands, removeCommands, commands);
+        insertRemoveOffset--;
         i++;
       }
     }
@@ -123,11 +117,46 @@ public class CommandsCalculator<T> {
     oldList.addAll(newList);
 
     // batch commands
-    for (int k = 0; k < commands.size(); k++) {
-
-    }
 
     return commands;
+  }
+
+  private void handleRemoveCommand(T item, int removePosition,
+      Map<T, ItemInsertedCommand> insertCommands, Map<T, ItemRemovedCommand> removeCommands,
+      List<AdapterCommand> commands) {
+
+    ItemInsertedCommand iCommand = insertCommands.get(item);
+    if (iCommand != null) {
+      commands.add(new ItemMovedCommand(removePosition, iCommand.position));
+      insertCommands.remove(item);
+      commands.remove(iCommand);
+      Log.d("Items",
+          "Alg: Move item (" + item + ") from " + removePosition + " to " + iCommand.position);
+    } else {
+      ItemRemovedCommand rCommand = new ItemRemovedCommand(removePosition);
+      removeCommands.put(item, rCommand);
+      commands.add(rCommand);
+      Log.d("Items", "Alg: removed item (" + item + ") at position " + removePosition);
+    }
+  }
+
+  private void handleInsertCommand(T item, int insertPosition,
+      Map<T, ItemInsertedCommand> insertCommands, Map<T, ItemRemovedCommand> removeCommands,
+      List<AdapterCommand> commands) {
+
+    ItemRemovedCommand rCommand = removeCommands.get(item);
+    if (rCommand != null) {
+      commands.add(new ItemMovedCommand(rCommand.position, insertPosition));
+      insertCommands.remove(item);
+      commands.remove(rCommand);
+      Log.d("Items",
+          "Alg: Move item (" + item + ") from " + rCommand.position + " to " + insertPosition);
+    } else {
+      ItemInsertedCommand iCommand = new ItemInsertedCommand(insertPosition);
+      insertCommands.put(item, iCommand);
+      commands.add(iCommand);
+      Log.d("Items", "Alg: insert item (" + item + ") at position " + insertPosition);
+    }
   }
 
   /**

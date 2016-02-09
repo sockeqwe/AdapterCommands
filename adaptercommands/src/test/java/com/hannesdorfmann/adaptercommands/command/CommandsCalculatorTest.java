@@ -1,6 +1,5 @@
 package com.hannesdorfmann.adaptercommands.command;
 
-import com.hannesdorfmann.adaptercommands.CommandsCalculator;
 import com.hannesdorfmann.adaptercommands.ItemChangeDetector;
 import java.util.ArrayList;
 import java.util.List;

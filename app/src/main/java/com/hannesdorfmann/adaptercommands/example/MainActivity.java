@@ -14,7 +14,7 @@ import butterknife.BindInt;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.hannesdorfmann.adaptercommands.AdapterCommandProcessor;
-import com.hannesdorfmann.adaptercommands.CommandsCalculator;
+import com.hannesdorfmann.adaptercommands.command.CommandsCalculator;
 import com.hannesdorfmann.adaptercommands.ItemChangeDetector;
 import com.hannesdorfmann.adaptercommands.command.AdapterCommand;
 import java.util.ArrayList;
