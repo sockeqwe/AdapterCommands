@@ -20,10 +20,10 @@ import java.util.List;
  * @author Hannes Dorfmann
  * @since 1.0
  */
-public class CommandsCalculator<T extends List> {
+public class CommandsCalculator<T> {
 
   // TODO considering using guavas BiMap
-  private T oldList;
+  private List<T> oldList;
 
   private int insertStartIndex = -1;
   private int insertLastIndex = -1;
@@ -39,12 +39,13 @@ public class CommandsCalculator<T extends List> {
    * data changed or not)
    * @return List of commands
    */
-  public List<AdapterCommand> calculateDiff(@NonNull T newList, ItemChangeDetector<T> detector) {
+  public List<AdapterCommand> calculateDiff(@NonNull List<T> newList,
+      ItemChangeDetector<T> detector) {
 
     int newSize = newList.size();
     // first time called
     if (oldList == null) {
-      oldList = (T) new ArrayList<>();
+      oldList = new ArrayList<>();
       oldList.addAll(newList);
 
       List<AdapterCommand> commands = new ArrayList<>(1);
@@ -60,9 +61,7 @@ public class CommandsCalculator<T extends List> {
       return commands;
     }
 
-
     List<AdapterCommand> commands = new ArrayList<>(newSize);
-
 
     int M = oldList.size();
     int N = newList.size();
@@ -81,7 +80,7 @@ public class CommandsCalculator<T extends List> {
       }
     }
 
-    int inserRemoveOffset = 0;
+    int insertRemoveOffset = 0;
     // recover LCS itself and print out non-matching lines to standard output
     int i = 0, j = 0;
     while (i < M && j < N) {
@@ -89,14 +88,16 @@ public class CommandsCalculator<T extends List> {
         i++;
         j++;
       } else if (opt[i + 1][j] >= opt[i][j + 1]) {
-        commands.add(new ItemRemovedCommand(i + inserRemoveOffset));
-        Log.d("Items", "Alg: removed item at " + (i));
-        inserRemoveOffset--;
+        commands.add(new ItemRemovedCommand(i + insertRemoveOffset));
+        T item = oldList.get(i);
+        Log.d("Items", "Alg: removed item (" + item + ") at position " + (i));
+        insertRemoveOffset--;
         i++;
       } else {
         commands.add(new ItemInsertedCommand(j));
-        Log.d("Items", "Alg: inserted item at " + (j));
-        inserRemoveOffset++;
+        T item = newList.get(j);
+        Log.d("Items", "Alg: inserted item (" + item + ") at position " + (j));
+        insertRemoveOffset++;
         j++;
       }
     }
@@ -105,13 +106,15 @@ public class CommandsCalculator<T extends List> {
     while (i < M || j < N) {
       if (i == M) {
         commands.add(new ItemInsertedCommand(j));
-        inserRemoveOffset++;
-        Log.d("Items", "Alg: inserted item  at " + (j));
+        insertRemoveOffset++;
+        T item = newList.get(j);
+        Log.d("Items", "Alg: inserted item (" + item + ") at position " + (j));
         j++;
       } else if (j == N) {
-        commands.add(new ItemRemovedCommand(i+inserRemoveOffset));
-        inserRemoveOffset--;
-        Log.d("Items", "Alg: removed item at " + (i));
+        commands.add(new ItemRemovedCommand(i + insertRemoveOffset));
+        insertRemoveOffset--;
+        T item = oldList.get(i);
+        Log.d("Items", "Alg: removed item (" + item + ") at position " + (i));
         i++;
       }
     }
@@ -119,12 +122,10 @@ public class CommandsCalculator<T extends List> {
     oldList.clear();
     oldList.addAll(newList);
 
-
     // batch commands
     for (int k = 0; k < commands.size(); k++) {
 
     }
-
 
     return commands;
   }
