@@ -67,7 +67,7 @@
       android:id="@+id/notifyChanged"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="notifyChanged"
+      android:text="check"
       android:layout_toRightOf="@+id/addRemove"
       android:layout_alignParentBottom="true"
       />

@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.BindColor;
 import butterknife.BindInt;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity
   Runnable refreshRunnable = new Runnable() {
     @Override public void run() {
       for (int i = 0; i < columns - 1; i++) {
-        items.add(i, new Item(id(), randomColor()));
+        items.add(0, new Item(id(), randomColor()));
       }
       refreshLayout.setRefreshing(false);
       updateAdapter();
@@ -110,9 +111,19 @@ public class MainActivity extends AppCompatActivity
   }
 
   @OnClick(R.id.move) public void moveClicked() {
+    if (items.size() < 2) {
+      Toast.makeText(this, "Minimum 2 items required", Toast.LENGTH_SHORT).show();
+      return;
+    }
+
+    int middle = items.size() / 2;
     Item i = items.remove(0);
-    items.add(i);
+    items.add(middle, i);
     Log.d("Items", "Moved Item(" + i + ") from position 0 to " + (items.size() - 1));
+    i = items.remove(1);
+    items.add(i);
+    Log.d("Items", "Moved Item(" + i + ") from position 0 to " + middle);
+
     updateAdapter();
   }
 
@@ -136,6 +147,7 @@ public class MainActivity extends AppCompatActivity
   @OnClick(R.id.addRemove) public void addRemoveClicked() {
 
     if (items.size() < 3) {
+      Toast.makeText(this, "Minimum 3 items required", Toast.LENGTH_SHORT).show();
       return;
     }
 

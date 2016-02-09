@@ -1,12 +1,9 @@
 package com.hannesdorfmann.adaptercommands.command;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 import com.hannesdorfmann.adaptercommands.ItemChangeDetector;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class is responsible to calculate the difference between two lists and returns a list of
@@ -75,8 +72,8 @@ public class CommandsCalculator<T> {
       }
     }
 
-    LinkedHashMap<T, ItemInsertedCommand> insertCommands = new LinkedHashMap<>();
-    LinkedHashMap<T, ItemRemovedCommand> removeCommands = new LinkedHashMap<>();
+    // LinkedHashMap<T, ItemInsertedCommand> insertCommands = new LinkedHashMap<>();
+    // LinkedHashMap<T, ItemRemovedCommand> removeCommands = new LinkedHashMap<>();
 
     int insertRemoveOffset = 0;
     // recover LCS itself and print out non-matching lines to standard output
@@ -86,13 +83,15 @@ public class CommandsCalculator<T> {
         i++;
         j++;
       } else if (opt[i + 1][j] >= opt[i][j + 1]) {
-        T item = oldList.get(i);
-        handleRemoveCommand(item, i + insertRemoveOffset, insertCommands, removeCommands, commands);
+        //T item = oldList.get(i);
+        //handleRemoveCommand(item, i + insertRemoveOffset, insertCommands, removeCommands, commands);
+        commands.add(new ItemRemovedCommand(i + insertRemoveOffset));
         insertRemoveOffset--;
         i++;
       } else {
-        T item = newList.get(j);
-        handleInsertCommand(item, j, insertCommands, removeCommands, commands);
+        //T item = newList.get(j);
+        //handleInsertCommand(item, j, insertCommands, removeCommands, commands);
+        commands.add(new ItemInsertedCommand(j));
         insertRemoveOffset++;
         j++;
       }
@@ -101,13 +100,15 @@ public class CommandsCalculator<T> {
     // dump out one remainder of one string if the other is exhausted
     while (i < M || j < N) {
       if (i == M) {
-        T item = newList.get(j);
-        handleInsertCommand(item, j, insertCommands, removeCommands, commands);
+        // T item = newList.get(j);
+        // handleInsertCommand(item, j, insertCommands, removeCommands, commands);
+        commands.add(new ItemInsertedCommand(j));
         insertRemoveOffset++;
         j++;
       } else if (j == N) {
-        T item = oldList.get(i);
-        handleRemoveCommand(item, i + insertRemoveOffset, insertCommands, removeCommands, commands);
+        // T item = oldList.get(i);
+        // handleRemoveCommand(item, i + insertRemoveOffset, insertCommands, removeCommands, commands);
+        commands.add(new ItemRemovedCommand(i + insertRemoveOffset));
         insertRemoveOffset--;
         i++;
       }
@@ -121,15 +122,23 @@ public class CommandsCalculator<T> {
     return commands;
   }
 
+  /*
   private void handleRemoveCommand(T item, int removePosition,
       Map<T, ItemInsertedCommand> insertCommands, Map<T, ItemRemovedCommand> removeCommands,
       List<AdapterCommand> commands) {
 
-    ItemInsertedCommand iCommand = insertCommands.get(item);
+    //ItemInsertedCommand iCommand = insertCommands.get(item);
+    ItemInsertedCommand iCommand = null;
     if (iCommand != null) {
-      commands.add(new ItemMovedCommand(removePosition, iCommand.position));
-      insertCommands.remove(item);
+      ItemMovedCommand mCommand = new ItemMovedCommand(removePosition, iCommand.position);
       commands.remove(iCommand);
+      for (int i = 0; i < commands.size(); i++) {
+        if (iCommand == commands.get(i)) {
+          commands.set(i, mCommand);
+          break;
+        }
+      }
+      insertCommands.remove(item);
       Log.d("Items",
           "Alg: Move item (" + item + ") from " + removePosition + " to " + iCommand.position);
     } else {
@@ -144,10 +153,17 @@ public class CommandsCalculator<T> {
       Map<T, ItemInsertedCommand> insertCommands, Map<T, ItemRemovedCommand> removeCommands,
       List<AdapterCommand> commands) {
 
-    ItemRemovedCommand rCommand = removeCommands.get(item);
+    // ItemRemovedCommand rCommand = removeCommands.get(item);
+    ItemRemovedCommand rCommand = null;
     if (rCommand != null) {
-      commands.add(new ItemMovedCommand(rCommand.position, insertPosition));
       insertCommands.remove(item);
+      ItemMovedCommand mCommand = new ItemMovedCommand(rCommand.position, insertPosition);
+      for (int i = 0; i < commands.size(); i++) {
+        if (rCommand == commands.get(i)) {
+          commands.set(i, mCommand);
+          break;
+        }
+      }
       commands.remove(rCommand);
       Log.d("Items",
           "Alg: Move item (" + item + ") from " + rCommand.position + " to " + insertPosition);
@@ -158,49 +174,5 @@ public class CommandsCalculator<T> {
       Log.d("Items", "Alg: insert item (" + item + ") at position " + insertPosition);
     }
   }
-
-  /**
-   * Add {@link ItemInsertedCommand} or {@link ItemRangeInsertedCommand} if necessary
-   *
-   * @param commands the list of commands where we will add the new command
-   */
-  private int addInsertCommandsIfNeeded(List<AdapterCommand> commands) {
-    if (insertStartIndex != -1) {
-      if (insertStartIndex == insertLastIndex) {
-        // Previous was just one single insert and not a range
-        commands.add(new ItemInsertedCommand(insertLastIndex));
-        insertStartIndex = -1;
-        insertLastIndex = -1;
-        return 1;
-      } else {
-        commands.add(
-            new ItemRangeInsertedCommand(insertStartIndex, insertLastIndex - insertStartIndex + 1));
-      }
-      int inserted = insertLastIndex - insertStartIndex + 1;
-      insertStartIndex = -1;
-      insertLastIndex = -1;
-      return inserted;
-    }
-
-    return 0;
-  }
-
-  /**
-   * Add {@link ItemChangedCommand} or  {@link ItemRangeChangedCommand} if necessary
-   *
-   * @param commands the list of commands where we will add the new command
-   */
-  private void addChangeCommandsIfNeeded(List<AdapterCommand> commands) {
-    if (changedStartIndex != -1) {
-      if (changedStartIndex == changedLastIndex) {
-        commands.add(new ItemChangedCommand(changedLastIndex));
-      } else {
-        commands.add(new ItemRangeChangedCommand(changedStartIndex,
-            changedLastIndex - changedStartIndex + 1));
-      }
-
-      changedLastIndex = -1;
-      changedStartIndex = -1;
-    }
-  }
+  */
 }
