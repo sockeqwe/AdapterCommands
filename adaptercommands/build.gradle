@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply from: '../.buildscript/maven-push.gradle'
+apply from: '../.buildscript/findbugs.gradle'
 
 android {
   compileSdkVersion 23

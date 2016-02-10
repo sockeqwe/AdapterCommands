@@ -31,4 +31,17 @@ public class ItemChangedCommand implements AdapterCommand {
         "position=" + position +
         '}';
   }
+
+  @Override public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ItemChangedCommand that = (ItemChangedCommand) o;
+
+    return position == that.position;
+  }
+
+  @Override public int hashCode() {
+    return position;
+  }
 }

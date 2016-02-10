@@ -1,7 +1,8 @@
 package com.hannesdorfmann.adaptercommands.command;
 
 import android.support.annotation.NonNull;
-import com.hannesdorfmann.adaptercommands.ItemChangeDetector;
+import android.support.annotation.Nullable;
+import com.hannesdorfmann.adaptercommands.ItemChangedDetector;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,15 +13,44 @@ import java.util.List;
  * @author Hannes Dorfmann
  * @since 1.0
  */
-public class CommandsCalculator<T> {
+public class DiffCommandsCalculator<T> {
 
-  // TODO considering using guavas BiMap
+  private final boolean itemRangeInsertedOnFirstDiff;
   private List<T> oldList;
 
-  private int insertStartIndex = -1;
-  private int insertLastIndex = -1;
-  private int changedStartIndex = -1;
-  private int changedLastIndex = -1;
+  /**
+   * Default constructor. Uses {@link EntireDataSetChangedCommand} as resulting command on first
+   * time {@link #diff(List)}. This can be changed by using {@link #DiffCommandsCalculator(boolean)}
+   * constructor
+   *
+   * @see #DiffCommandsCalculator(boolean)
+   */
+  public DiffCommandsCalculator() {
+    this(false);
+  }
+
+  /**
+   * This constructor allows you to specify the resulting command on first time {@link
+   * #diff(List)}.
+   *
+   * @param itemRangeInsertedOnFirstDiff if <b>true</b> {@link ItemRangeInsertedCommand} will be
+   * used which cause a RecyclerView item animations. Use <b>false</b> if {@link
+   * EntireDataSetChangedCommand} should be used (no RecyclerView item animations).
+   */
+  public DiffCommandsCalculator(boolean itemRangeInsertedOnFirstDiff) {
+    this.itemRangeInsertedOnFirstDiff = itemRangeInsertedOnFirstDiff;
+  }
+
+  /**
+   * This method calculates the difference of previous list of items and the new list.
+   * This method is <b>not thread safe</b>. This method doesn't use {@link ItemChangedDetector}
+   *
+   * @param newList The new items that we use to calculate the difference
+   * @return List of commands
+   */
+  public List<AdapterCommand> diff(@NonNull List<T> newList) {
+    return diff(newList, null);
+  }
 
   /**
    * This method calculates the difference of previous list of items and the new list.
@@ -31,8 +61,12 @@ public class CommandsCalculator<T> {
    * data changed or not)
    * @return List of commands
    */
-  public List<AdapterCommand> calculateDiff(@NonNull List<T> newList,
-      ItemChangeDetector<T> detector) {
+  public List<AdapterCommand> diff(@NonNull List<T> newList,
+      @Nullable ItemChangedDetector<T> detector) {
+
+    if (newList == null) {
+      throw new NullPointerException("newList == null");
+    }
 
     int newSize = newList.size();
     // first time called
@@ -41,7 +75,12 @@ public class CommandsCalculator<T> {
       oldList.addAll(newList);
 
       List<AdapterCommand> commands = new ArrayList<>(1);
-      commands.add(new EntireDataSetChangedCommand());
+
+      if (newSize == 0 || !itemRangeInsertedOnFirstDiff) {
+        commands.add(new EntireDataSetChangedCommand());
+      } else {
+        commands.add(new ItemRangeInsertedCommand(0, newSize));
+      }
       return commands;
     }
 
@@ -122,7 +161,8 @@ public class CommandsCalculator<T> {
     oldList.clear();
     oldList.addAll(newList);
 
-    // batch commands
+    // TODO batch commands (see batching branch).
+    // TODO move commands (see handleRemoveCommand() methods etc.)
 
     return commands;
   }

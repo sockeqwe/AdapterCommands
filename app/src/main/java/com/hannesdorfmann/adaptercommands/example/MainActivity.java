@@ -15,8 +15,8 @@ import butterknife.BindInt;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.hannesdorfmann.adaptercommands.AdapterCommandProcessor;
-import com.hannesdorfmann.adaptercommands.command.CommandsCalculator;
-import com.hannesdorfmann.adaptercommands.ItemChangeDetector;
+import com.hannesdorfmann.adaptercommands.command.DiffCommandsCalculator;
+import com.hannesdorfmann.adaptercommands.ItemChangedDetector;
 import com.hannesdorfmann.adaptercommands.command.AdapterCommand;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,9 +47,9 @@ public class MainActivity extends AppCompatActivity
   int lastId = 0;
   ItemAdapter adapter;
   AdapterCommandProcessor commandProcessor;
-  CommandsCalculator commandsCalculator = new CommandsCalculator();
+  DiffCommandsCalculator<Item> commandsCalculator = new DiffCommandsCalculator<Item>();
 
-  ItemChangeDetector<Item> changeDetector = new ItemChangeDetector<Item>() {
+  ItemChangedDetector<Item> changeDetector = new ItemChangedDetector<Item>() {
     @Override public boolean hasChanged(Item oldItem, Item newItem) {
       return oldItem.color != newItem.color;
     }
@@ -185,7 +185,8 @@ public class MainActivity extends AppCompatActivity
   }
 
   private void updateAdapter() {
-    List<AdapterCommand> commands = commandsCalculator.calculateDiff(items, changeDetector);
+    List<AdapterCommand> commands = commandsCalculator.diff(items, changeDetector);
+    Log.d("Items", "commands " + commands);
     commandProcessor.execute(commands);
   }
 
