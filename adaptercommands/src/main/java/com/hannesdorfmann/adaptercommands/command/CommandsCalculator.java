@@ -79,7 +79,12 @@ public class CommandsCalculator<T> {
     // recover LCS itself and print out non-matching lines to standard output
     int i = 0, j = 0;
     while (i < M && j < N) {
-      if (oldList.get(i).equals(newList.get(j))) {
+      T oldItem = oldList.get(i);
+      T newItem = newList.get(j);
+      if (oldItem.equals(newItem)) {
+        if (detector != null && detector.hasChanged(oldItem, newItem)) {
+          commands.add(new ItemChangedCommand(j));
+        }
         i++;
         j++;
       } else if (opt[i + 1][j] >= opt[i][j + 1]) {

@@ -128,6 +128,9 @@ public class MainActivity extends AppCompatActivity
   }
 
   @OnClick(R.id.change) public void changeClicked() {
+    if (items.size() < 3) {
+      Toast.makeText(this, "Minimum 3 items required", Toast.LENGTH_SHORT).show();
+    }
     int changeCount = random.nextInt(3) + 1;
     for (int i = 0; i < changeCount; i++) {
       int position = random.nextInt(items.size());
@@ -144,14 +147,14 @@ public class MainActivity extends AppCompatActivity
     adapter.notifyDataSetChanged();
   }
 
-  @OnClick(R.id.addRemove) public void addRemoveClicked() {
+  @OnClick(R.id.complex) public void complexClicked() {
 
     if (items.size() < 3) {
       Toast.makeText(this, "Minimum 3 items required", Toast.LENGTH_SHORT).show();
       return;
     }
 
-    int removals = random.nextInt(4) + 1;
+    int removals = random.nextInt(3) + 1;
     for (int i = 0; i < removals; i++) {
       if (items.isEmpty()) {
         continue;
@@ -159,6 +162,15 @@ public class MainActivity extends AppCompatActivity
       int removePosition = random.nextInt(items.size());
       Item item = items.remove(removePosition);
       Log.d("Items", "removed Item(" + item + ") at position " + removePosition);
+    }
+
+    int changeCount = random.nextInt(3) + 1;
+    for (int i = 0; i < changeCount; i++) {
+      int position = random.nextInt(items.size());
+      Item item = items.get(position).copy();
+      item.color = randomColor();
+      items.set(position, item);
+      Log.d("Items", "changed Item(" + item + ") at position " + position);
     }
 
     int inserts = random.nextInt(4) + 1;
@@ -173,8 +185,6 @@ public class MainActivity extends AppCompatActivity
   }
 
   private void updateAdapter() {
-
-    //adapter.notifyDataSetChanged();
     List<AdapterCommand> commands = commandsCalculator.calculateDiff(items, changeDetector);
     commandProcessor.execute(commands);
   }

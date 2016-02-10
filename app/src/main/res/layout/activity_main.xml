@@ -28,7 +28,7 @@
       android:layout_height="wrap_content"
       android:layout_toLeftOf="@+id/remove"
       android:text="Add"
-      android:layout_above="@+id/addRemove"
+      android:layout_above="@+id/complex"
       />
 
 
@@ -40,7 +40,7 @@
       android:layout_marginLeft="6dp"
       android:layout_marginRight="6dp"
       android:text="Remove"
-      android:layout_above="@+id/addRemove"
+      android:layout_above="@+id/complex"
 
       />
 
@@ -51,14 +51,14 @@
       android:layout_height="wrap_content"
       android:layout_toRightOf="@+id/remove"
       android:text="Change"
-      android:layout_above="@+id/addRemove"
+      android:layout_above="@+id/complex"
       />
 
   <Button
-      android:id="@+id/addRemove"
+      android:id="@+id/complex"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Add Remove"
+      android:text="complex"
       android:layout_alignParentBottom="true"
       android:layout_centerHorizontal="true"
       />
@@ -68,7 +68,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="check"
-      android:layout_toRightOf="@+id/addRemove"
+      android:layout_toRightOf="@+id/complex"
       android:layout_alignParentBottom="true"
       />
 
@@ -77,7 +77,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="move"
-        android:layout_toLeftOf="@+id/addRemove"
+        android:layout_toLeftOf="@+id/complex"
         android:layout_alignParentBottom="true"
         />
 
