@@ -17,6 +17,7 @@ public class DiffCommandsCalculator<T> {
 
   private final boolean itemRangeInsertedOnFirstDiff;
   private List<T> oldList;
+  private final ItemChangedDetector<T> detector;
 
   /**
    * Default constructor. Uses {@link EntireDataSetChangedCommand} as resulting command on first
@@ -24,9 +25,10 @@ public class DiffCommandsCalculator<T> {
    * constructor
    *
    * @see #DiffCommandsCalculator(boolean)
+   * @see #DiffCommandsCalculator(boolean, ItemChangedDetector)
    */
   public DiffCommandsCalculator() {
-    this(false);
+    this(false, null);
   }
 
   /**
@@ -38,18 +40,32 @@ public class DiffCommandsCalculator<T> {
    * EntireDataSetChangedCommand} should be used (no RecyclerView item animations).
    */
   public DiffCommandsCalculator(boolean itemRangeInsertedOnFirstDiff) {
-    this.itemRangeInsertedOnFirstDiff = itemRangeInsertedOnFirstDiff;
+    this(itemRangeInsertedOnFirstDiff, null);
   }
 
   /**
-   * This method calculates the difference of previous list of items and the new list.
-   * This method is <b>not thread safe</b>. This method doesn't use {@link ItemChangedDetector}
+   * Constructs a new instance with an {@link ItemChangedDetector}
    *
-   * @param newList The new items that we use to calculate the difference
-   * @return List of commands
+   * @param detector that is responsible to determine whether an item has been changed (internal
+   * data changed) or not
    */
-  public List<AdapterCommand> diff(@NonNull List<T> newList) {
-    return diff(newList, null);
+  public DiffCommandsCalculator(ItemChangedDetector<T> detector) {
+    this(false, detector);
+  }
+
+  /**
+   * Creates a new instance.
+   *
+   * @param itemRangeInsertedOnFirstDiff if <b>true</b> {@link ItemRangeInsertedCommand} will be
+   * used which cause a RecyclerView item animations. Use <b>false</b> if {@link
+   * EntireDataSetChangedCommand} should be used (no RecyclerView item animations).
+   * @param detector that is responsible to determine whether an item has been changed (internal
+   * data changed or not)
+   */
+  public DiffCommandsCalculator(boolean itemRangeInsertedOnFirstDiff,
+      @Nullable ItemChangedDetector<T> detector) {
+    this.itemRangeInsertedOnFirstDiff = itemRangeInsertedOnFirstDiff;
+    this.detector = detector;
   }
 
   /**
@@ -57,12 +73,9 @@ public class DiffCommandsCalculator<T> {
    * This method is <b>not thread safe</b>
    *
    * @param newList The new items that we use to calculate the difference
-   * @param detector that is responsible to determine whether an item has been changed (internal
-   * data changed or not)
    * @return List of commands
    */
-  public List<AdapterCommand> diff(@NonNull List<T> newList,
-      @Nullable ItemChangedDetector<T> detector) {
+  public List<AdapterCommand> diff(@NonNull List<T> newList) {
 
     if (newList == null) {
       throw new NullPointerException("newList == null");

@@ -15,13 +15,13 @@ public class DiffCommandsCalculatorTest {
   private DiffCommandsCalculator<Item> calculator;
 
   @Before public void init() {
-    calculator = new DiffCommandsCalculator<Item>();
+    calculator = new DiffCommandsCalculator<Item>(new Detector());
   }
 
   @Test public void firstTime() {
 
     List<Item> newItems = newList("a", "b");
-    List<AdapterCommand> commands = calculator.diff(newItems, null);
+    List<AdapterCommand> commands = calculator.diff(newItems);
 
     Assert.assertEquals(1, commands.size());
     Assert.assertTrue(commands.get(0) instanceof EntireDataSetChangedCommand);
@@ -30,7 +30,7 @@ public class DiffCommandsCalculatorTest {
   @Test public void firstTimeItemRangeInserted() {
     DiffCommandsCalculator<Item> calculator = new DiffCommandsCalculator<>(true);
     List<Item> newItems = newList("a", "b");
-    List<AdapterCommand> commands = calculator.diff(newItems, null);
+    List<AdapterCommand> commands = calculator.diff(newItems);
 
     Assert.assertEquals(1, commands.size());
     assertContainCommand(commands, new ItemRangeInsertedCommand(0, 2));
@@ -38,7 +38,7 @@ public class DiffCommandsCalculatorTest {
 
   @Test public void firstTimeEmptyList() {
     List<Item> newItems = new ArrayList<>();
-    List<AdapterCommand> commands = calculator.diff(newItems, null);
+    List<AdapterCommand> commands = calculator.diff(newItems);
 
     Assert.assertEquals(1, commands.size());
     Assert.assertTrue(commands.get(0) instanceof EntireDataSetChangedCommand);
@@ -56,9 +56,8 @@ public class DiffCommandsCalculatorTest {
   @Test public void insertAndChange() {
 
     // Warmup
-    ItemChangedDetector<Item> changeDetector = new Detector();
     List<Item> items = newList("a", "b", "c");
-    calculator.diff(items, changeDetector);
+    calculator.diff(items);
 
     //
     // Test insert
@@ -69,7 +68,7 @@ public class DiffCommandsCalculatorTest {
     items.add(5, new Item("b4"));
     items.add(new Item("c2"));
 
-    List<AdapterCommand> commands = calculator.diff(items, changeDetector);
+    List<AdapterCommand> commands = calculator.diff(items);
     Assert.assertEquals(5, commands.size());
 
     assertContainCommand(commands, new ItemInsertedCommand(1));
@@ -82,16 +81,6 @@ public class DiffCommandsCalculatorTest {
     // Test changes
     //
 
-    // Changes without detector
-    items.set(0, new Item("a", "newValueA"));
-    items.set(2, new Item("b", "newValueB"));
-    items.set(3, new Item("b2", "newValueB2"));
-    items.set(4, new Item("b3", "newValueB3"));
-    items.set(7, new Item("c2", "newValuec2"));
-
-    commands = calculator.diff(items);
-    Assert.assertTrue(commands.isEmpty());
-
     // Changes with detector
     items.set(0, new Item("a", "newOtherValueA"));
     items.set(2, new Item("b", "newOtherValueB"));
@@ -99,7 +88,7 @@ public class DiffCommandsCalculatorTest {
     items.set(4, new Item("b3", "newOtherValueB3"));
     items.set(7, new Item("c2", "newOtherValuec2"));
 
-    commands = calculator.diff(items, changeDetector);
+    commands = calculator.diff(items);
 
     Assert.assertEquals(5, commands.size());
     assertContainCommand(commands, new ItemChangedCommand(0));
@@ -109,12 +98,36 @@ public class DiffCommandsCalculatorTest {
     assertContainCommand(commands, new ItemChangedCommand(7));
   }
 
+  @Test public void changesWithoutDetector() {
+
+    // Warmup
+    List<Item> items = newList("a", "b", "c");
+    items.add(1, new Item("a2"));
+    items.add(3, new Item("b2"));
+    items.add(4, new Item("b3"));
+    items.add(5, new Item("b4"));
+    items.add(new Item("c2"));
+
+    calculator = new DiffCommandsCalculator<>();
+    calculator.diff(items);
+
+    // Changes without detector
+    items.set(0, new Item("a", "newValueA"));
+    items.set(2, new Item("b", "newValueB"));
+    items.set(3, new Item("b2", "newValueB2"));
+    items.set(4, new Item("b3", "newValueB3"));
+    items.set(7, new Item("c2", "newValuec2"));
+
+    List<AdapterCommand> commands = calculator.diff(items);
+    Assert.assertTrue(commands.isEmpty());
+  }
+
   @Test public void move() {
 
     // Warmup
     ItemChangedDetector<Item> changeDetector = new Detector();
     List<Item> items = newList("a", "b", "c", "d", "e");
-    calculator.diff(items, changeDetector);
+    calculator.diff(items);
 
     //
     // Move elements
@@ -124,7 +137,7 @@ public class DiffCommandsCalculatorTest {
     Item c = items.remove(1);
     items.add(4, c);
 
-    List<AdapterCommand> commands = calculator.diff(items, changeDetector);
+    List<AdapterCommand> commands = calculator.diff(items);
 
     // TODO update once move commands are implemented
     Assert.assertEquals(4, commands.size());
@@ -134,13 +147,11 @@ public class DiffCommandsCalculatorTest {
     assertContainCommand(commands, new ItemInsertedCommand(4));
   }
 
-  @Test
-  public void remove(){
+  @Test public void remove() {
     // Warmup
     ItemChangedDetector<Item> changeDetector = new Detector();
     List<Item> items = newList("a", "b", "c", "d", "e", "f");
     calculator.diff(items);
-
 
     items.remove(1);
     items.remove(3);
@@ -171,7 +182,6 @@ public class DiffCommandsCalculatorTest {
     Assert.fail("Expected command " + equalsCommand + " but not found");
     return null;
   }
-
 
   static class Item {
     public String id;

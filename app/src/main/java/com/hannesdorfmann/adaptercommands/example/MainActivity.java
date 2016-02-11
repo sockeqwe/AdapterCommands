@@ -42,18 +42,18 @@ public class MainActivity extends AppCompatActivity
     }
   };
 
-  List<Item> items = new ArrayList<Item>();
-  Random random = new Random();
-  int lastId = 0;
-  ItemAdapter adapter;
-  AdapterCommandProcessor commandProcessor;
-  DiffCommandsCalculator<Item> commandsCalculator = new DiffCommandsCalculator<Item>();
-
   ItemChangedDetector<Item> changeDetector = new ItemChangedDetector<Item>() {
     @Override public boolean hasChanged(Item oldItem, Item newItem) {
       return oldItem.color != newItem.color;
     }
   };
+
+  List<Item> items = new ArrayList<Item>();
+  Random random = new Random();
+  int lastId = 0;
+  ItemAdapter adapter;
+  AdapterCommandProcessor commandProcessor;
+  DiffCommandsCalculator<Item> commandsCalculator = new DiffCommandsCalculator<Item>(changeDetector);
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity
   }
 
   private void updateAdapter() {
-    List<AdapterCommand> commands = commandsCalculator.diff(items, changeDetector);
+    List<AdapterCommand> commands = commandsCalculator.diff(items);
     Log.d("Items", "commands " + commands);
     commandProcessor.execute(commands);
   }
