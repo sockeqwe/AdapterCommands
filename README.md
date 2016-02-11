@@ -51,10 +51,10 @@ public class MainActivity extends AppCompatActivity {
 Best practise is to use a `PresentationModel` and `Model-View-Presenter`. See  my [blog post](http://hannesdorfmann.com/android/adapter-commands) for a concrete example.
 
 ## Customization
- - comparing items
+  - comparing items
  `DiffCommandsCalculator` uses standard java's `equals()` method to compare two items (one from old list, one from new list).
- So you have to override `equals()` and `hashCode()` in your model class (use IDE to generate that):
- ```java
+  So you have to override `equals()` and `hashCode()` in your model class (use IDE to generate that):
+  ```java
 public class Item {
 
   int id;
@@ -91,7 +91,7 @@ class MyItemChangedDetector implements ItemChangedDetector<Item>() {
 DiffCommandsCalculator<Item> calculator = new DiffCommandsCalculator<>(new MyItemChangedDetector());
  ```
 
-- We also can specify what exactly should happen on the first time we use `DiffCommandsCalculator` (there is no old list to compare to).
+ - We also can specify what exactly should happen on the first time we use `DiffCommandsCalculator` (there is no old list to compare to).
  In this case we either could call `adapter.notifyDatasetChanged()` (`EntireDatasetChangedCommand`) which is the default behaviour or `adapter.notifyItemRangeInserted(0, items.size())` (`ItemRangeInsertedCommand`) which then will run `ItemAnimator` so that items will animate in.
  You can specify the behaviour as constructor parameter `DiffCommandsCalculator(boolean itemRangeInsertedOnFirstDiff)`: `new DiffCommandsCalculator(false)` uses `EntireDatasetChangedCommand` (no animations, equivalent to `new DiffCommandsCalculator()`) whereas `new DiffCommandsCalculator(true)` uses `ItemRangeInsertedCommand` (animations).
 
