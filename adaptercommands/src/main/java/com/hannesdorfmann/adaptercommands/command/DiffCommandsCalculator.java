@@ -8,7 +8,12 @@ import java.util.List;
 
 /**
  * This class is responsible to calculate the difference between two lists and returns a list of
- * {@link AdapterCommand} that can be executed to enable RecyclerView animations
+ * {@link AdapterCommand} that can be executed to enable RecyclerView animations.
+ *
+ * <p>
+ * <b>This class is not thread safe!</b> If you need a thread safe instance use {@link
+ * ThreadSafeDiffCommandsCalculator}
+ * </p>
  *
  * @author Hannes Dorfmann
  * @since 1.0
@@ -70,10 +75,11 @@ public class DiffCommandsCalculator<T> {
 
   /**
    * This method calculates the difference of previous list of items and the new list.
-   * This method is <b>not thread safe</b>
+   * This method is <b>not thread safe</b>.
    *
    * @param newList The new items that we use to calculate the difference
    * @return List of commands
+   * @see ThreadSafeDiffCommandsCalculator
    */
   public List<AdapterCommand> diff(@NonNull List<T> newList) {
 
