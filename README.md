@@ -1,6 +1,6 @@
 #AdapterCommands
 Drop in solution to animate RecyclerView's dataset changes by using the `command pattern.
-Read my [blog post]() for more information.
+Read my [blog post](http://hannesdorfmann.com/android/adapter-commands) for more information.
 
 Keep in mind that the runtime of `DiffCommandsCalculator` is `O(n*m)` (n = number of items in old list, m = number of items in new list).
 So you better run this on a background thread if your data set contains many items.
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 ## MVP
-Best practise is to use a `PresentationModel` and `Model-View-Presenter`. See  my [blog post]() for a concrete example.
+Best practise is to use a `PresentationModel` and `Model-View-Presenter`. See  my [blog post](http://hannesdorfmann.com/android/adapter-commands) for a concrete example.
 
 ## License
 
