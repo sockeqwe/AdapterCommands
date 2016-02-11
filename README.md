@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 Best practise is to use a `PresentationModel` and `Model-View-Presenter`. See  my [blog post](http://hannesdorfmann.com/android/adapter-commands) for a concrete example.
 
 ## Customization
-  - comparing items
+ - comparing items
  `DiffCommandsCalculator` uses standard java's `equals()` method to compare two items (one from old list, one from new list).
   So you have to override `equals()` and `hashCode()` in your model class (use IDE to generate that):
   ```java
