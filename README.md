@@ -1,14 +1,54 @@
 #AdapterCommands
+Drop in solution to animate RecyclerView's dataset changes by using the `command pattern.
+Read my [blog post]() for more information.
+
+Keep in mind that the runtime of `DiffCommandsCalculator` is `O(n*m)` (n = number of items in old list, m = number of items in new list).
+So you better run this on a background thread if your data set contains many items.
 
 ##Dependencies
 
 ```groovy
-compile 'com.hannesdorfmann.adaptercommands:adaptercommands:1.0.0'
+compile 'com.hannesdorfmann.adaptercommands:adaptercommands:1.0.1'
 ```
 
-## Motivation
-
 ## How to use
+There are basically 2 components:
+  - `DiffCommandsCalculator` that calculates the difference from previous data set to the new data set and returns `List<AdapterCommand>`
+  - `AdapterCommandProcessor` takes `List<AdapterCommand>` and executes each command to trigger RecyclerView's `ItemAnimator` to run animations.
+
+```java
+public class MainActivity extends AppCompatActivity {
+
+  @Bind(R.id.recyclerView) RecyclerView recyclerView;
+
+  List<Item> items = new ArrayList<Item>();
+  Random random = new Random();
+  ItemAdapter adapter; // RecyclerView adapter
+  AdapterCommandProcessor commandProcessor;
+  DiffCommandsCalculator<Item> commandsCalculator = new DiffCommandsCalculator<Item>();
+
+  @Override protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    ButterKnife.bind(this);
+
+    adapter = new ItemAdapter(this, items);
+    recyclerView.setAdapter(adapter);
+    recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+
+    commandProcessor = new AdapterCommandProcessor(adapter);
+  }
+
+  // Called when new items should be displayed in RecyclerView
+  public void setItems(List<Item> newItems){
+    adapter.setItems(newItems);
+    List<AdapterCommand> commands = commandsCalculator.diff(items);
+    commandProcessor.execute(commands); // executes commands that triggers animations
+  }
+```
+
+## MVP
+Best practise is to use a `PresentationModel` and `Model-View-Presenter`. See  my [blog post]() for a concrete example.
 
 ## License
 
