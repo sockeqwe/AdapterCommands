@@ -8,12 +8,12 @@ So you better run this on a background thread if your data set contains many ite
 ##Dependencies
 
 ```groovy
-compile 'com.hannesdorfmann.adaptercommands:adaptercommands:1.0.1'
+compile 'com.hannesdorfmann.adaptercommands:adaptercommands:1.0.2'
 ```
 
 ## How to use
 There are basically 2 components:
-  - `DiffCommandsCalculator` that calculates the difference from previous data set to the new data set and returns `List<AdapterCommand>`
+  - `DiffCommandsCalculator` that calculates the difference from previous data set to the new data set and returns `List<AdapterCommand>`. Please note that `DiffCommandsCalculator` is **not thread safe**. If you need a thread safe instance use `ThreadSafeDiffCommandsCalculator`.
   - `AdapterCommandProcessor` takes `List<AdapterCommand>` and executes each command to trigger RecyclerView's `ItemAnimator` to run animations.
 
 ```java
