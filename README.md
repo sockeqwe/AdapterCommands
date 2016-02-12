@@ -1,5 +1,5 @@
 #AdapterCommands
-Drop in solution to animate RecyclerView's dataset changes by using the `command pattern`.
+Drop in solution to animate RecyclerView's dataset changes by using the `command pattern` for adapters with **not stable ids**.
 Read my [blog post](http://hannesdorfmann.com/android/adapter-commands) for more information.
 
 Keep in mind that the runtime of `DiffCommandsCalculator` is `O(n*m)` (n = number of items in old list, m = number of items in new list).
