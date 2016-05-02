@@ -8,7 +8,7 @@ So you better run this on a background thread if your data set contains many ite
 ##Dependencies
 
 ```groovy
-compile 'com.hannesdorfmann.adaptercommands:adaptercommands:1.0.2'
+compile 'com.hannesdorfmann.adaptercommands:adaptercommands:1.0.3'
 ```
 
 ## How to use
