@@ -18,6 +18,7 @@ package com.hannesdorfmann.adaptercommands.command;
 
 import com.hannesdorfmann.adaptercommands.ItemChangedDetector;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
@@ -176,6 +177,16 @@ public class DiffCommandsCalculatorTest {
     Assert.assertEquals(2, commands.size());
     assertContainCommand(commands, new ItemRemovedCommand(1));
     assertContainCommand(commands, new ItemRemovedCommand(3));
+  }
+
+  @Test public void comparingEmptyList() {
+    List<AdapterCommand> commands = calculator.diff(Collections.<Item>emptyList());
+    Assert.assertEquals(1, commands.size());
+    Assert.assertTrue(commands.get(0) instanceof EntireDataSetChangedCommand);
+
+    // Apply changes on empty list
+    List<AdapterCommand> commands2 = calculator.diff(Collections.<Item>emptyList());
+    Assert.assertTrue(commands2.isEmpty());
   }
 
   private List<Item> newList(String... items) {

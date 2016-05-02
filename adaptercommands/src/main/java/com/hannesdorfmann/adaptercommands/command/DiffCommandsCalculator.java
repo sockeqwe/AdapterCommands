@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.hannesdorfmann.adaptercommands.ItemChangedDetector;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -121,6 +122,9 @@ public class DiffCommandsCalculator<T> {
 
     // new list empty
     if (newList.isEmpty()) {
+      if (oldList.isEmpty()){
+        return Collections.emptyList();
+      }
       List<AdapterCommand> commands = new ArrayList<>(1);
       commands.add(new ItemRangeRemovedCommand(0, oldList.size()));
       oldList.clear(); // for next call

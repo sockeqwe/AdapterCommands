@@ -33,8 +33,7 @@ public class AdapterCommandProcessorTest {
   private AdapterCommandProcessor processor;
   private RecyclerView.Adapter adapter;
 
-  @Before
-  public void init(){
+  @Before public void init() {
     adapter = Mockito.mock(RecyclerView.Adapter.class);
     this.processor = new AdapterCommandProcessor(adapter);
   }
@@ -43,21 +42,21 @@ public class AdapterCommandProcessorTest {
     try {
       new AdapterCommandProcessor(null);
       Assert.fail("Nullpointer expected");
-    }catch (NullPointerException e){
+    } catch (NullPointerException e) {
       Assert.assertEquals("adapter == null", e.getMessage());
     }
   }
 
-  @Test public void executeNullList(){
+  @Test public void executeNullList() {
     try {
       processor.execute(null);
       Assert.fail("Nullpointer expected");
-    } catch (NullPointerException e){
+    } catch (NullPointerException e) {
       Assert.assertEquals("commands == null", e.getMessage());
     }
   }
 
-  @Test public void executeCommands(){
+  @Test public void executeCommands() {
 
     AdapterCommand c1 = Mockito.mock(AdapterCommand.class);
     AdapterCommand c2 = Mockito.mock(AdapterCommand.class);
@@ -71,6 +70,4 @@ public class AdapterCommandProcessorTest {
     Mockito.verify(c1, Mockito.times(1)).execute(adapter);
     Mockito.verify(c2, Mockito.times(1)).execute(adapter);
   }
-
-
 }
