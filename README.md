@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
   // Called when new items should be displayed in RecyclerView
   public void setItems(List<Item> newItems){
     adapter.setItems(newItems);
-    List<AdapterCommand> commands = commandsCalculator.diff(items);
+    List<AdapterCommand> commands = commandsCalculator.diff(newItems);
     commandProcessor.execute(commands); // executes commands that triggers animations
   }
 ```
