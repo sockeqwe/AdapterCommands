@@ -21,7 +21,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:2.1.0'
+    classpath 'com.android.tools.build:gradle:2.1.2'
 
     // NOTE: Do not place your application dependencies here; they belong
     // in the individual module build.gradle files
@@ -49,8 +49,8 @@ ext {
   javaTargetCompatibility = JavaVersion.VERSION_1_7
 
   // Libraries
-  appcompat7Version = '23.1.1'
-  recyclerviewVersion = '23.1.1'
+  appcompat7Version = '24.0.0'
+  recyclerviewVersion = '24.0.0'
 
   // Test Libs
   robolectricVersion = '3.0'
