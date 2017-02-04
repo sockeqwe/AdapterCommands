@@ -48,6 +48,17 @@ public class ThreadSafeDiffCommandsCalculator<T> extends DiffCommandsCalculator<
   }
 
   /**
+   * This method calculates the difference between two lists.
+   * This call is thread safe
+   *
+   * @param newList The new items that we use to calculate the difference
+   * @return List of commands
+   */
+  @Override public synchronized List<AdapterCommand> diff(@NonNull List<T> oldList, @NonNull List<T> newList) {
+    return super.diff(oldList, newList);
+  }
+
+  /**
    * This method calculates the difference of previous list of items and the new list.
    * This call is thread safe
    *

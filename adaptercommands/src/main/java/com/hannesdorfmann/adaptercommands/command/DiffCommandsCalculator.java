@@ -91,6 +91,19 @@ public class DiffCommandsCalculator<T> {
   }
 
   /**
+   * This method calculates the difference between two lists.
+   * This method is <b>not thread safe</b>.
+   *
+   * @param newList The new items that we use to calculate the difference
+   * @return List of commands
+   * @see ThreadSafeDiffCommandsCalculator
+   */
+  public List<AdapterCommand> diff(@NonNull List<T> oldList, @NonNull List<T> newList) {
+    this.oldList = oldList;
+    return diff(newList);
+  }
+
+  /**
    * This method calculates the difference of previous list of items and the new list.
    * This method is <b>not thread safe</b>.
    *
