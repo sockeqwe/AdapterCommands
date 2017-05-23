@@ -1,4 +1,4 @@
-#AdapterCommands
+# AdapterCommands
 Drop in solution to animate RecyclerView's dataset changes by using the `command pattern` for adapters with **not stable ids**.
 Read my [blog post](http://hannesdorfmann.com/android/adapter-commands) for more information.
 
