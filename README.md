@@ -1,3 +1,6 @@
+# Deprecated
+This library is deprecated. Use [DiffUtils](https://developer.android.com/reference/android/support/v7/util/DiffUtil.html) from Android RecyclerView library which does exactly the same as AdapterCommands. AdapterCommands has been developed and released before DiffUtils has been released, however, now that Google has published and is maintaining DiffUtils there is very little reason to prefer this library over DiffUtils.
+
 # AdapterCommands
 Drop in solution to animate RecyclerView's dataset changes by using the `command pattern` for adapters with **not stable ids**.
 Read my [blog post](http://hannesdorfmann.com/android/adapter-commands) for more information.
